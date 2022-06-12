@@ -1,0 +1,59 @@
+# Web Serial
+
+Tired of uploading website data to ESP32 everytime there is a small change on webpage or justs a CSS fix? Maybe forgot to add function to JS file??
+
+This method allows hosting website on a local server or a cloud server like Github. The website connects to the local device via local IP address and allows data transmission through it.
+
+---
+
+### About
+
+This is an example project which allows to send data from server hosted websites (like Github) to Local network devices.
+The code can be modified according to application. It can also be implemented to get data from devices and publish it to server hosted websites.
+
+[![IMAGE ALT TEXT HERE](https://raw.githubusercontent.com/sam-tj/Web_Serial/master/demo.mp4)](https://raw.githubusercontent.com/sam-tj/Web_Serial/master/demo.mp4)
+
+### Why is this better?
+
+- Update website files which might include HTML, CSS, JS, images or other types
+- No storage issue as website is hosted on server
+- More free memory of ESP32
+- Better performance of website with multiple pages and animations
+- Improves speed of ESP#@ due to reduced load on memory
+- ...
+
+---
+
+### List of components used:
+
+- [ESP 32](https://www.az-delivery.de/en/products/esp32-developmentboard "ESP 32")
+
+---
+
+### Libraries Required
+
+You need to download the following:
+
+- ESP32 HTTPS Server by Frank Hessel : https://github.com/fhessel/esp32_https_server ( Can be downloaded Library Manager)
+
+---
+
+### Tutorial
+
+1. Get the code
+2. Get the libraries
+3. Attach everything
+4. Upload the code
+   🔥🔥🔥🔥🔥
+
+---
+
+### References
+
+---
+
+- https://github.com/fhessel/esp32_https_server
+- http://sandboxelectronics.com/?p=165
+- https://github.com/fhessel/esp32_https_server/issues/55#issuecomment-549375480
+- https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
+- https://arduino.stackexchange.com/questions/56365/arduino-convert-stdstring-to-string
