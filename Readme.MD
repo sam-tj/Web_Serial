@@ -19,7 +19,7 @@ The code can be modified according to application. It can also be implemented to
 - No storage issue as website is hosted on server
 - More free memory of ESP32
 - Better performance of website with multiple pages and animations
-- Improves speed of ESP#@ due to reduced load on memory
+- Improves speed of ESP32 due to reduced load on memory
 - ...
 
 ---
