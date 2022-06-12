@@ -11,7 +11,7 @@ This method allows hosting website on a local server or a cloud server like Gith
 This is an example project which allows to send data from server hosted websites (like Github) to Local network devices.
 The code can be modified according to application. It can also be implemented to get data from devices and publish it to server hosted websites.
 
-[![IMAGE ALT TEXT HERE](https://raw.githubusercontent.com/sam-tj/Web_Serial/master/demo.mp4)](https://raw.githubusercontent.com/sam-tj/Web_Serial/master/demo.mp4)
+[Demo Video](https://raw.githubusercontent.com/sam-tj/Web_Serial/master/demo.mp4 "Demo Video")
 
 ### Why is this better?
 
