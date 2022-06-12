@@ -9,8 +9,8 @@
 using namespace httpsserver;
 
 // Replace with your network credentials
-const char* ssid = "Das ist kaputt";
-const char* password = "Asdfghjkl";
+const char* ssid = "ssid";
+const char* password = "password";
 
 SSLCert * cert;
 HTTPSServer * secureServer;
@@ -80,9 +80,10 @@ void setup() {
     std::string paramVal;
     if (params->getQueryParameter(paramName, paramVal)) {
       Serial.println();
-      Serial.println("Data received: ");
+      Serial.println();
+      Serial.print("Data received: ");
       //Serial.print(paramName.c_str());
-      Serial.print(paramVal.c_str());
+      Serial.println(paramVal.c_str());
       Serial.println();
       Serial.println();
     }
