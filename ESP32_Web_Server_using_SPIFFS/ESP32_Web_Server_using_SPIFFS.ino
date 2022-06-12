@@ -1,20 +1,32 @@
 // Import required libraries
 #include <WiFi.h>
 //#include "ESPAsyncWebServer.h"
-#include <WiFiClient.h>
-#include <WebServer.h>
-#include <WiFiAP.h>
-#include "SPIFFS.h"
+//#include <WiFiClient.h>
+//#include <WebServer.h>
+#include <HTTPSServer.hpp>
+#include <SSLCert.hpp>
+#include <HTTPRequest.hpp>
+#include <HTTPResponse.hpp>
+//#include <WiFiAP.h>
+//#include "SPIFFS.h"
+
+using namespace httpsserver;
+
 
 // Replace with your network credentials
 const char* ssid = "Das ist kaputt";
 const char* password = "Asdfghjkl";
 
+
+SSLCert * cert;
+
+HTTPSServer * secureServer;
+
 // Create AsyncWebServer object on port 80
 //AsyncWebServer server(80);
-WebServer server(80);
-
-void handleRoot() {
+//WebServer server(80);
+/*
+  void handleRoot() {
   String myFile = "/index.html";
   if (SPIFFS.exists(myFile)) {
     Serial.println(F("myFile founded on   SPIFFS"));   //ok
@@ -27,8 +39,8 @@ void handleRoot() {
     Serial.println(F("D49 stylsheet not found on SPIFFS"));
     handleNotFound;
   }
-}
-void handleCSS() {
+  }
+  void handleCSS() {
   String myFile = "/style.css";
   if (SPIFFS.exists(myFile)) {
     Serial.println(F("myFile founded on   SPIFFS"));   //ok
@@ -42,9 +54,9 @@ void handleCSS() {
     Serial.println(F("D49 stylsheet not found on SPIFFS"));
     handleNotFound;
   }
-}
+  }
 
-void handleNotFound() {
+  void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -58,19 +70,33 @@ void handleNotFound() {
   }
   server.send(404, "text/plain", message);
   Serial.print(message);
-}
-
+  }
+*/
 void setup() {
   // Serial port for debugging purposes
   Serial.begin(115200);
   //  pinMode(ledPin, OUTPUT);
+  /*
+    // Initialize SPIFFS
+    if (!SPIFFS.begin(true)) {
+      Serial.println("An Error has occurred while mounting SPIFFS");
+      return;
+    }
+  */
 
-  // Initialize SPIFFS
-  if (!SPIFFS.begin(true)) {
-    Serial.println("An Error has occurred while mounting SPIFFS");
+  cert = new SSLCert();
+  int createCertResult = createSelfSignedCert(
+                           *cert,
+                           KEYSIZE_2048,
+                           "CN=myesp.local,O=acme,C=US");
+
+  if (createCertResult != 0) {
+    Serial.printf("Error generating certificate");
     return;
   }
-
+  Serial.println("Certificate created with success");
+  secureServer = new HTTPSServer(cert);
+  
   // Create Wi-Fi access point
   //WiFi.softAP(ssid, password);
   //IPAddress myIP = WiFi.softAPIP();
@@ -82,23 +108,38 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
- 
+
   // Print ESP32 Local IP Address
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  ResourceNode * nodeRoot = new ResourceNode("/", "GET", [](HTTPRequest * req, HTTPResponse * res) {
+    res->println("Secure Hello World!!!");
+  });
+
+
+  secureServer->registerNode(nodeRoot);
+  
   // Route for root / web page
-  server.on("/", handleRoot);
+  //server.on("/", handleRoot);
 
   // Route to load style.css file
-  server.on("/style.css", handleCSS);
+  //server.on("/style.css", handleCSS);
 
-  server.onNotFound(handleNotFound);
+  //server.onNotFound(handleNotFound);
 
   // Start server
-  server.begin();
+  Serial.println("Starting HTTPS server...");
+  secureServer->start();
+
+  if (secureServer->isRunning()) {
+    Serial.println("Server ready.");
+  }
+  //server.begin();
 }
 
 void loop() {
-  server.handleClient();
+  //server.handleClient();
+  secureServer->loop();
+  delay(1);
 }

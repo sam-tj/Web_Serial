@@ -5,6 +5,6 @@ function sendData() {
       document.getElementById("ADCValue").innerHTML = this.responseText;
     }
   };
-  xhttp.open("GET", "http://192.168.0.3/PDRS?param1=%22testing%22&param2=%22testing1%22", true);
+  xhttp.open("GET", "https://192.168.0.3/PDRS?param1=%22testing%22&param2=%22testing1%22", true);
   xhttp.send();
 }
