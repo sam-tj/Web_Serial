@@ -69,8 +69,9 @@ void setup() {
   }
 
   // Print ESP32 Local IP Address
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("IP address: ");
+  Serial.print(WiFi.localIP());
+  Serial.println();
 
   ResourceNode * nodeRoot = new ResourceNode("/", "GET", [](HTTPRequest * req, HTTPResponse * res) {
     res->println("Secure Hello World!!!");
@@ -79,7 +80,7 @@ void setup() {
     std::string paramVal;
     if (params->getQueryParameter(paramName, paramVal)) {
       Serial.println();
-      Serial.println();
+      Serial.println("Data received: ");
       //Serial.print(paramName.c_str());
       Serial.print(paramVal.c_str());
       Serial.println();

@@ -5,6 +5,12 @@ function sendData() {
       console.log("success");
     }
   };
+  console.log(
+    "https://" +
+      document.getElementById("url_val").value +
+      "/?to_serial=" +
+      document.getElementById("text_val").value
+  );
   xhttp.open(
     "GET",
     "https://" +
