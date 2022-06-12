@@ -1,108 +1,67 @@
 // Import required libraries
 #include <WiFi.h>
-//#include "ESPAsyncWebServer.h"
-//#include <WiFiClient.h>
-//#include <WebServer.h>
 #include <HTTPSServer.hpp>
 #include <SSLCert.hpp>
 #include <HTTPRequest.hpp>
 #include <HTTPResponse.hpp>
-//#include <WiFiAP.h>
-//#include "SPIFFS.h"
+#include <Preferences.h>
 
 using namespace httpsserver;
-
 
 // Replace with your network credentials
 const char* ssid = "Das ist kaputt";
 const char* password = "Asdfghjkl";
 
-
 SSLCert * cert;
-
 HTTPSServer * secureServer;
+Preferences preferences;
 
-// Create AsyncWebServer object on port 80
-//AsyncWebServer server(80);
-//WebServer server(80);
-/*
-  void handleRoot() {
-  String myFile = "/index.html";
-  if (SPIFFS.exists(myFile)) {
-    Serial.println(F("myFile founded on   SPIFFS"));   //ok
-    File file = SPIFFS.open(myFile, "r");
-    //server.send(200, "text/html", file);
-    size_t sent = server.streamFile(file, "text/html" );
-  }
-  else
-  {
-    Serial.println(F("D49 stylsheet not found on SPIFFS"));
-    handleNotFound;
-  }
-  }
-  void handleCSS() {
-  String myFile = "/style.css";
-  if (SPIFFS.exists(myFile)) {
-    Serial.println(F("myFile founded on   SPIFFS"));   //ok
-    File file = SPIFFS.open(myFile, "r");
-    //server.send(200, "text/css", file);
-    size_t sent = server.streamFile(file, "text/css" );
-    file.close();
-  }
-  else
-  {
-    Serial.println(F("D49 stylsheet not found on SPIFFS"));
-    handleNotFound;
-  }
-  }
+void corsCallback(HTTPRequest * req, HTTPResponse * res) {
+  Serial.println(">> CORS here...");
+  res->setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res->setHeader("Access-Control-Allow-Origin",  "*");
+  res->setHeader("Access-Control-Allow-Headers", "*");
+}
 
-  void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-  Serial.print(message);
-  }
-*/
 void setup() {
   // Serial port for debugging purposes
   Serial.begin(115200);
-  //  pinMode(ledPin, OUTPUT);
-  /*
-    // Initialize SPIFFS
-    if (!SPIFFS.begin(true)) {
-      Serial.println("An Error has occurred while mounting SPIFFS");
+  Serial.print("Boot success \n\n");
+
+  preferences.begin("certi_data", false);
+
+  size_t pkLen = preferences.getBytesLength("PKData");
+  size_t certLen = preferences.getBytesLength("CertData");
+
+  if (pkLen && certLen) {
+
+    uint8_t *pkBuffer = new uint8_t[pkLen];
+    preferences.getBytes("PKData", pkBuffer, pkLen);
+
+    uint8_t *certBuffer = new uint8_t[certLen];
+    preferences.getBytes("CertData", certBuffer, certLen);
+
+    cert = new SSLCert(certBuffer, certLen, pkBuffer, pkLen);
+    Serial.println("Certificate loaded with success");
+  }
+  else {
+    cert = new SSLCert();
+    int createCertResult = createSelfSignedCert(
+                             *cert,
+                             KEYSIZE_1024,
+                             "CN=tuteja.sameer,O=sam.tj@github.io,C=DE");
+
+    if (createCertResult != 0) {
+      Serial.printf("Error generating certificate");
       return;
     }
-  */
-
-  cert = new SSLCert();
-  int createCertResult = createSelfSignedCert(
-                           *cert,
-                           KEYSIZE_2048,
-                           "CN=myesp.local,O=acme,C=US");
-
-  if (createCertResult != 0) {
-    Serial.printf("Error generating certificate");
-    return;
+    preferences.putBytes("PKData", (uint8_t *)cert->getPKData(), cert->getPKLength());
+    preferences.putBytes("CertData", (uint8_t *)cert->getCertData(), cert->getCertLength());
+    Serial.println("Certificate created with success");
   }
-  Serial.println("Certificate created with success");
+
   secureServer = new HTTPSServer(cert);
-  
-  // Create Wi-Fi access point
-  //WiFi.softAP(ssid, password);
-  //IPAddress myIP = WiFi.softAPIP();
-  //Serial.print("AP IP address: ");
-  //Serial.println(myIP);
-  // Connect to Wi-Fi
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -115,18 +74,22 @@ void setup() {
 
   ResourceNode * nodeRoot = new ResourceNode("/", "GET", [](HTTPRequest * req, HTTPResponse * res) {
     res->println("Secure Hello World!!!");
+    ResourceParameters * params = req->getParams();
+    std::string paramName ="to_serial";
+    std::string paramVal;
+    if (params->getQueryParameter(paramName, paramVal)) {
+      Serial.println();
+      Serial.println();
+      //Serial.print(paramName.c_str());
+      Serial.print(paramVal.c_str());
+      Serial.println();
+      Serial.println();
+    }
   });
-
-
   secureServer->registerNode(nodeRoot);
-  
-  // Route for root / web page
-  //server.on("/", handleRoot);
 
-  // Route to load style.css file
-  //server.on("/style.css", handleCSS);
-
-  //server.onNotFound(handleNotFound);
+  ResourceNode * corsNode = new ResourceNode("/*", "OPTIONS", &corsCallback);
+  secureServer->registerNode(corsNode);
 
   // Start server
   Serial.println("Starting HTTPS server...");
@@ -135,11 +98,17 @@ void setup() {
   if (secureServer->isRunning()) {
     Serial.println("Server ready.");
   }
-  //server.begin();
 }
 
 void loop() {
-  //server.handleClient();
   secureServer->loop();
   delay(1);
 }
+
+/* ref
+ * https://github.com/fhessel/esp32_https_server/issues/55#issuecomment-549375480
+ * https://github.com/isemann/MeshCom_1.49/blob/c54ae1c1ebd8334e689e35d6d4015928d96edad1/src/mesh/http/WebServer.cpp
+ * https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
+ * https://arduino.stackexchange.com/questions/56365/arduino-convert-stdstring-to-string
+ * https://github.com/fhessel/esp32_https_server
+ */
