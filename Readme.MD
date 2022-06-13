@@ -22,6 +22,13 @@ The code can be modified according to application. It can also be implemented to
 - Improves speed of ESP32 due to reduced load on memory
 - ...
 
+### Where can this be used?
+
+It can be used in almost all project which need a web portal or a web server. Some of my projects can also be ported with this method.
+
+- https://sam-tj.github.io/MoverProject/data/
+- https://www.instructables.com/Pocket-ECG-Monitor/
+
 ---
 
 ### List of components used:
@@ -44,6 +51,8 @@ You need to download the following:
 2. Get the libraries
 3. Attach everything
 4. Upload the code
+5. Open page with local ip once to accept the certificate. This is important as it is user generated certificate and is not certified from authorities
+6. Use same IP at https://sam-tj.github.io/Web_Serial/ and send text to print on serial monitor.
    🔥🔥🔥🔥🔥
 
 ---
