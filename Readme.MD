@@ -20,6 +20,7 @@ The code can be modified according to application. It can also be implemented to
 - More free memory of ESP32
 - Better performance of website with multiple pages and animations
 - Improves speed of ESP32 due to reduced load on memory
+- Uses mDNS hence no more finding IP Address of device
 - ...
 
 ### Where can this be used?
@@ -51,10 +52,11 @@ You need to download the following:
 2. Get the libraries
 3. Attach everything
 4. Upload the code
-5. Open page with local ip once to accept the certificate. This is important as it is user generated certificate and is not certified from authorities
+5. Open page with local ip as [https://###.###.###.###] or with https://esp32.local/ once to accept the certificate. This is important as it is user generated certificate and is not certified from authorities
 6. Use same IP at https://sam-tj.github.io/Web_Serial/ and send text to print on serial monitor.
    🔥🔥🔥🔥🔥
 
+You can change the code accordingly to get permanent certificate for HTTPS connection.
 ---
 
 ### References
@@ -66,3 +68,4 @@ You need to download the following:
 - https://github.com/fhessel/esp32_https_server/issues/55#issuecomment-549375480
 - https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
 - https://arduino.stackexchange.com/questions/56365/arduino-convert-stdstring-to-string
+- https://techtutorialsx.com/category/esp32/
